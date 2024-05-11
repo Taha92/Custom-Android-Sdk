@@ -10,7 +10,7 @@ android {
     defaultConfig {
         applicationId = "com.example.customcamerasdkapp"
         minSdk = 29
-        targetSdk = 30
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -65,6 +65,7 @@ dependencies {
 
     // CameraX View class
     implementation("androidx.camera:camera-view:1.0.0-alpha14")
+    implementation("androidx.camera:camera-video:1.0.0-alpha14")
 
     // TFLite
     implementation("org.tensorflow:tensorflow-lite-task-vision:0.3.1")

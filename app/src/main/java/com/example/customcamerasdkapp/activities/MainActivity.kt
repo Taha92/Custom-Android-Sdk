@@ -1,4 +1,4 @@
-package com.example.customcamerasdkapp
+package com.example.customcamerasdkapp.activities
 
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -9,6 +9,7 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
@@ -22,10 +23,18 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.video.FileOutputOptions
+import androidx.camera.video.Recording
+import androidx.camera.video.VideoRecordEvent
+import androidx.camera.view.CameraController
+import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
+import androidx.camera.view.video.AudioConfig
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import com.example.customcamerasdkapp.utils.AppConstant
+import com.example.customcamerasdkapp.R
 import com.example.customcamerasdkapp.models.DetectionResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -40,6 +49,8 @@ import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity() {
 
+    private var controller: LifecycleCameraController? = null
+    private var recording: Recording? = null
     private var imageCapture: ImageCapture? = null
     private lateinit var outputDirectory: File
     private lateinit var cameraExecutor: ExecutorService
@@ -65,16 +76,39 @@ class MainActivity : AppCompatActivity() {
         if (allPermissionsGranted()) {
             startCamera()
         } else {
-            ActivityCompat.requestPermissions(this, AppConstant.REQUIRED_PERMISSIONS, AppConstant.REQUEST_CODE_PERMISSIONS)
+            ActivityCompat.requestPermissions(this,
+                AppConstant.REQUIRED_PERMISSIONS,
+                AppConstant.REQUEST_CODE_PERMISSIONS
+            )
         }
 
         findViewById<Button>(R.id.camera_capture_button).setOnClickListener {
-            takePhoto()
+            takePicture()
         }
+        findViewById<Button>(R.id.btnVideo).setOnClickListener {
+            takeVideo()
+        }
+
         outputDirectory = getOutputDirectory()
         currentPhotoPath = outputDirectory.absolutePath
         //outputDirectory = createImageFile()
         cameraExecutor = Executors.newSingleThreadExecutor()
+
+        controller =
+            LifecycleCameraController(applicationContext).apply {
+                setEnabledUseCases(
+                    CameraController.IMAGE_CAPTURE or
+                            CameraController.VIDEO_CAPTURE
+                )
+            }
+    }
+
+    private fun takeVideo() {
+        controller?.let { recordVideo(it) }
+    }
+
+    private fun takePicture() {
+        controller?.let { takePhoto() }
     }
 
     private fun takePhoto() {
@@ -310,6 +344,48 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         cameraExecutor.shutdown()
+    }
+
+    private fun recordVideo(controller: LifecycleCameraController) {
+        if(recording != null) {
+            recording?.stop()
+            recording = null
+            return
+        }
+
+        if(!allPermissionsGranted()) {
+            return
+        }
+
+        val outputFile = File(Environment.DIRECTORY_DCIM, "my-recording.mp4")
+        recording = controller.startRecording(
+            FileOutputOptions.Builder(outputFile).build(),
+            AudioConfig.create(true),
+            ContextCompat.getMainExecutor(applicationContext),
+        ) { event ->
+            when(event) {
+                is VideoRecordEvent.Finalize -> {
+                    if(event.hasError()) {
+                        recording?.close()
+                        recording = null
+
+                        Toast.makeText(
+                            applicationContext,
+                            "Video capture failed",
+                            Toast.LENGTH_LONG
+                        ).show()
+
+                        Log.e(AppConstant.TAG, "recordVideo: "+event.error.toString())
+                    } else {
+                        Toast.makeText(
+                            applicationContext,
+                            "Video capture succeeded",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            }
+        }
     }
 
 
