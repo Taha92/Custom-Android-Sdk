@@ -55,7 +55,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.3.0")
     implementation("androidx.exifinterface:exifinterface:1.3.2")
-    implementation("com.android.support:multidex:2.0.1")
+    //implementation("com.android.support:multidex:2.0.1")
 /*
 
 
@@ -79,7 +79,5 @@ dependencies {
     /*implementation("org.tensorflow:tensorflow-lite-task-vision:0.3.1")
     implementation("org.tensorflow:tensorflow-lite-support:0.1.0")
     implementation("org.tensorflow:tensorflow-lite-metadata:0.1.0")*/
-
-
 
 }
