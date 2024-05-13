@@ -9,6 +9,7 @@ class AppConstant {
         const val MAX_FONT_SIZE = 96F
         const val REQUEST_CODE_PERMISSIONS = 20
         val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA,
-            Manifest.permission.RECORD_AUDIO)
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.READ_MEDIA_VIDEO)
     }
 }

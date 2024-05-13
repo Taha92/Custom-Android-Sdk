@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "CustomCameraSdkApp"
 include(":app")
- 
+include(":custom-camera")
