@@ -72,7 +72,7 @@ dependencies {
     implementation("org.tensorflow:tensorflow-lite-task-vision:0.3.1")
 */
 
-    implementation(":custom-camera")
+    implementation(project(":custom-camera"))
     //implementation("com.github.Taha92:Custom-Android-Sdk:1.0")
 
     /*implementation("org.tensorflow:tensorflow-lite-task-vision:0.3.1")
