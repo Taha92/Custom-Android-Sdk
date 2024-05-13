@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    `maven-publish`
 }
 
 android {
@@ -56,4 +57,16 @@ dependencies {
 
     // TFLite
     implementation("org.tensorflow:tensorflow-lite-task-vision:0.3.1")
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "com.github.Taha92"
+            artifactId = "custom-camera"
+            version = "1.0"
+
+            //from(components["release"])
+        }
+    }
 }

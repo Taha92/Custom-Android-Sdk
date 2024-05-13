@@ -1,7 +1,6 @@
 package com.example.custom_camera.activities
 
 import android.Manifest
-import android.content.ContentValues
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -13,7 +12,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.provider.MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
@@ -27,9 +25,6 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.FileOutputOptions
-import androidx.camera.video.MediaStoreOutputOptions
-import androidx.camera.video.Quality
-import androidx.camera.video.QualitySelector
 import androidx.camera.video.Recorder
 import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
@@ -50,6 +45,7 @@ import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.task.vision.detector.ObjectDetector
 import java.io.File
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -368,12 +364,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             return
         }
 
-        val folder = File(getExternalFilesDir(Environment.DIRECTORY_DCIM).toString() + File.separator + "MyApp")
+        val folder = File(
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "MyApp")
+
         if (!folder.exists()) {
             folder.mkdir()
         }
 
-        val outputFile = File.createTempFile("SOME_NAME", ".mp4", folder)
+        val outputFile = File.createTempFile("my-recording", SimpleDateFormat(AppConstant.FILENAME_FORMAT, Locale.US).format(System.currentTimeMillis()) + ".mp4", folder)
 
         //val outputFile = File(filesDir, "my-recording.mp4")
         if (ActivityCompat.checkSelfPermission(
@@ -387,7 +385,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         btnRecordVideo.setBackgroundResource(R.drawable.ic_stop)
         recording = controller.startRecording(
             FileOutputOptions.Builder(outputFile).build(),
-            AudioConfig.create(true),
+            AudioConfig.create(false),
             ContextCompat.getMainExecutor(applicationContext),
         ) { event ->
             when(event) {
@@ -413,82 +411,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 }
             }
         }
-    }
-
-    private fun recordVideo() {
-        //binding.buttonCapture.setImageResource(R.drawable.baseline_stop_24)
-
-        val currentRecording = recording
-        if (currentRecording != null) {
-            // A recording is already in progress, stop it
-            currentRecording.stop()
-            recording = null
-            //binding.buttonCapture.setImageResource(R.drawable.baseline_camera_24)
-            return
-        }
-
-        val name: String = SimpleDateFormat(
-            "yyy-MM-dd-HH-mm-ss-SSS",
-            Locale.getDefault()
-        ).format(System.currentTimeMillis())
-        val contentValues = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
-            put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
-            put(MediaStore.MediaColumns.RELATIVE_PATH, "Movies/CameraX-Recorder")
-        }
-
-        val options = MediaStoreOutputOptions.Builder(applicationContext.contentResolver, EXTERNAL_CONTENT_URI)
-            .setContentValues(contentValues)
-            .build()
-
-        val recorder = Recorder.Builder()
-            .setQualitySelector(QualitySelector.from(Quality.HIGHEST))
-            .build()
-        videoCapture = VideoCapture.withOutput(recorder)
-
-
-        recording = videoCapture.output.prepareRecording(this, options)
-            .start(ContextCompat.getMainExecutor(applicationContext)) { videoRecordEvent ->
-                // Handle different recording events
-                when (videoRecordEvent) {
-                    is VideoRecordEvent.Start -> {
-                        // Handle the start of a new active recording
-                        //binding.buttonCapture.setImageResource(R.drawable.baseline_stop_24)
-                    }
-
-                    is VideoRecordEvent.Pause -> {
-                        // Handle the case where the active recording is paused
-                    }
-
-                    is VideoRecordEvent.Resume -> {
-                        // Handle the case where the active recording is resumed
-                    }
-
-                    is VideoRecordEvent.Finalize -> {
-                        val finalizeEvent = videoRecordEvent
-                        // Handle the finalize event for the active recording, checking Finalize.getError()
-                        val error = finalizeEvent.error
-                        if (error != VideoRecordEvent.Finalize.ERROR_NONE) {
-                            // Handle error during recording finalization
-                            Toast.makeText(
-                                this,
-                                "There was an error during video finalization: ${videoRecordEvent.error}",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        } else {
-                            Toast.makeText(
-                                this,
-                                "The video has been successfully recorded",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                        //binding.buttonCapture.setImageResource(R.drawable.baseline_camera_24)
-                    }
-                }
-                // All events, including VideoRecordEvent.Status, contain RecordingStats.
-                // This can be used to update the UI or track the recording duration.
-                val recordingStats = videoRecordEvent.recordingStats
-            }
     }
 
     override fun onClick(v: View?) {
