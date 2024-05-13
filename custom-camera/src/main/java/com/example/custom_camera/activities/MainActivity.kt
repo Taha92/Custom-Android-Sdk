@@ -415,5 +415,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
+    fun customCamera() {}
+
 
 }

@@ -56,28 +56,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.3.0")
     implementation("androidx.exifinterface:exifinterface:1.3.2")
     //implementation("com.android.support:multidex:2.0.1")
-/*
-
-
-    // CameraX core library using camera2 implementation
-    implementation("androidx.camera:camera-camera2:1.3.3")
-
-    // CameraX Lifecycle Library
-    implementation("androidx.camera:camera-lifecycle:1.3.3")
-
-    // CameraX View class
-    implementation("androidx.camera:camera-view:1.0.0-alpha14")
-    implementation("androidx.camera:camera-video:1.0.0-alpha14")
-
-    // TFLite
-    implementation("org.tensorflow:tensorflow-lite-task-vision:0.3.1")
-*/
 
     implementation(project(":custom-camera"))
-    //implementation("com.github.Taha92:Custom-Android-Sdk:1.0")
-
-    /*implementation("org.tensorflow:tensorflow-lite-task-vision:0.3.1")
-    implementation("org.tensorflow:tensorflow-lite-support:0.1.0")
-    implementation("org.tensorflow:tensorflow-lite-metadata:0.1.0")*/
+    implementation("com.github.Taha92:Custom-Android-Sdk:1.0.2")
 
 }
