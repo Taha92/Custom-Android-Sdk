@@ -14,7 +14,6 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
@@ -25,9 +24,7 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.FileOutputOptions
-import androidx.camera.video.Recorder
 import androidx.camera.video.Recording
-import androidx.camera.video.VideoCapture
 import androidx.camera.video.VideoRecordEvent
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
@@ -45,7 +42,6 @@ import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.task.vision.detector.ObjectDetector
 import java.io.File
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -59,12 +55,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var outputDirectory: File
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var viewFinder: PreviewView
-    private lateinit var ivCapture: ImageView
     private lateinit var imageView: AppCompatImageView
     private lateinit var btnRecordVideo: AppCompatButton
     private lateinit var btnTakePicture: AppCompatButton
     private lateinit var currentPhotoPath: String
-    private lateinit var videoCapture: VideoCapture<Recorder>
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,7 +70,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         // initialize views
         viewFinder = findViewById(R.id.viewFinder)
-        ivCapture = findViewById(R.id.iv_capture)
         imageView = findViewById(R.id.imageView)
         btnRecordVideo = findViewById(R.id.btnRecordVideo)
         btnTakePicture = findViewById(R.id.btnTakePicture)
@@ -145,10 +138,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     val savedUri = Uri.fromFile(photoFile)
-
-                    // set the saved uri to the image view
-                    ivCapture.visibility = View.VISIBLE
-                    ivCapture.setImageURI(savedUri)
 
                     imageView.visibility = View.VISIBLE
                     imageView.setImageResource(R.drawable.img_meal_two)
@@ -296,7 +285,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         val imgWithResult = drawDetectionResult(bitmap, resultToDisplay)
         runOnUiThread {
             imageView.setImageBitmap(imgWithResult)
-            ivCapture.visibility = View.GONE
             viewFinder.visibility = View.GONE
         }
     }

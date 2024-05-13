@@ -55,6 +55,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.3.0")
     implementation("androidx.exifinterface:exifinterface:1.3.2")
+    implementation("com.android.support:multidex:2.0.1")
 /*
 
 
